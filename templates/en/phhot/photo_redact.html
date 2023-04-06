@@ -1,0 +1,10 @@
+{% extends "ru/phhot/base.html" %}
+{% block title %}<title>Redactor</title>{% endblock %}
+{% block base %}
+<form method="post" enctype="multipart/form-data">
+  <input type="file" name="file" >
+  <input type="submit" value="Upload">
+</form>
+<input type="text" class="form-control" placeholder="Имя пользователя" aria-label="Имя пользователя" aria-describedby="basic-addon1">
+{{ message }}
+{% endblock %}
