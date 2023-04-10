@@ -159,6 +159,11 @@ def login():
     return render_template('/en/phhot/login.html', form=form)
 
 
+@app.route('/en/shop/home')
+def shop_home():
+    return render_template('/en/shop/base.html')
+
+
 @app.route('/logout')
 @login_required
 def logout():
@@ -179,6 +184,7 @@ def ru_phhot_about():
 @app.route("/ru/phhot/home")
 def ru_phhot_home():
     return render_template("ru/phhot/base.html")
+
 
 
 def main():
