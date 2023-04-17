@@ -1,5 +1,6 @@
 {% extends "header.html" %}
-{% block title %}<title>Home</title>{% endblock %}
+{% block title %}<title xmlns="http://www.w3.org/1999/html"
+                        xmlns="http://www.w3.org/1999/html">Home</title>{% endblock %}
 {% block content %}
 <div class="row row-cols-1 row-cols-md-3 g-4">
   <div class="col">
@@ -64,6 +65,46 @@
       <div class="card-footer">
         <small class="text-muted">Последнее обновление 3 мин.
           назад</small>
+      </div>
+    </div>
+  </div>
+  <div class="col">
+    <div class="card h-100">
+      <img src="..." class="card-img-top" alt=" Something went wrong!">
+      <div class="card-body">
+        <h5 class="card-title">DJ-controls</h5>
+        <p>Элджей - Рваные джинсы</p>
+        <audio controls>
+          <source src="C:\Users\Savva\PycharmProjects\Flaskproject2\Macan - Asphalt 8.mp3" type="audio/mpeg">
+          <source src="C:/Users/Savva/PycharmProjects/Flaskproject2/Macan-Asphalt-8.ogg" type="audio/ogg">
+        </audio>
+        <p>Александр Клименков - Четырнадцать</p>
+        <audio controls>
+          <source src="audio/music.mp3" type="audio/mpeg">
+          <a href="audio/music.mp3">.</a>
+        </audio>
+      </div>
+    </div>
+  </div>
+  <div class="col">
+    <div class="card h-100">
+      <img src="..." class="card-img-top" alt=" Something went wrong!">
+      <div class="card-body">
+        <h5 class="card-title">
+          <p class="text-center">Casino chip market</p>
+        </h5>
+        <p class="text-center">Here you can buy chips for our casino.</p>
+      </div>
+      <div class="card-footer">
+        <small class="text">
+          <a class="nav-link" href="shop/home">
+            <p class="text-center">
+              <span class="align-middle">
+                <b>Buy!</b>
+              </span>
+            </p>
+          </a>
+        </small>
       </div>
     </div>
   </div>

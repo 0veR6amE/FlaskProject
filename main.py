@@ -8,6 +8,7 @@ from data import db_session
 from data.users import User
 from forms.user import RegisterForm
 from forms.login import LoginForm
+from data.inventory import Value
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key_for_flask_project'
@@ -80,6 +81,7 @@ def login_en_phhot_redactor():
             return render_template("en/phhot/photo_redact.html",
                                    message='Файл не того типа')
     return render_template("en/phhot/photo_redact.html", message='')
+
 
 @app.route("/en/phhot/redactor", methods=['GET', 'POST'])
 def en_phhot_redactor():
@@ -157,6 +159,30 @@ def login():
                                message="Неправильный логин или пароль",
                                form=form)
     return render_template('/en/phhot/login.html', form=form)
+
+
+@app.route('/en/shop/home')
+def shop_home():
+    return render_template('/en/shop/base.html')
+
+
+@app.route('/en/shop/home/success', methods=['POST'])
+def shop_success():
+    db_sess = db_session.create_session()
+    if 'Free' in request.POST:
+        name = 'Free'
+    elif 'Amateur' in request.POST:
+        name = 'Amateur'
+    elif 'Professional' in request.POST:
+        name = 'Professional'
+
+    value = Value(
+        name=name,
+    )
+    db_sess.add(value)
+    db_sess.commit()
+    print('1')
+    return render_template('НЕ ЗАБЫТЬ РАЗРАБОТАТЬ ДИЗАЙН ДЕБИЛЫ')
 
 
 @app.route('/logout')
