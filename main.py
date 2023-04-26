@@ -14,7 +14,7 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key_for_flask_project'
 app.config['SERVER_NAME'] = "127.0.0.1:5000"
 app.config['UPLOAD_FOLDER'] = \
-    'C:/Users/Serj/PycharmProjects/FlaskProject/user/download/'
+    'C:/Users/4444/PycharmProjects/FlaskProject_Git_Hub/user/download/'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
 login_manager = LoginManager()
@@ -45,6 +45,16 @@ def home():
 @app.route("/en/")
 def en_home():
     return render_template('en/main.html')
+
+
+@app.route("/en/casino/")
+def en_casino_startscreen():
+    return render_template("en/casino/startscreen.html", username='lox', balance='0')
+
+
+@app.route("/en/casino/slots")
+def en_casino_slots():
+    return render_template("en/casino/slots.html", username='lox', balance='0')
 
 
 @app.route("/en/phhot/about")
