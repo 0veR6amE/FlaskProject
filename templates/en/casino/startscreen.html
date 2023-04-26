@@ -1,0 +1,36 @@
+{% extends "header.html" %}
+{% block title %}<title xmlns="http://www.w3.org/1999/html">YandexCasino</title>{% endblock %}
+{% block content %}
+<style>
+  body { background:
+  #000000 url(https://gamerwall.pro/uploads/posts/2021-11/thumbs/1637067521_1-gamerwall-pro-p-temnii-fon-tekstura-oboi-na-zastavku-1.jpg);
+
+    margin-right: 10px;
+    margin-left: 10px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+</style>
+<h1 style="color:Yellow" align="center">YANDEXCASINO</h1>
+<h2 style="color:Yellow" align="right">{{ username }}</h2>
+<h3 style="color:White" align="right">Баланс: {{ balance }}</h3>
+<div class="buttons" style="
+    padding-left: 240px;
+    margin-left: 200px;
+    margin-top: 250px;
+    margin-bottom: 250px;
+    padding-right: 100px;
+    margin-right: 200px;
+">
+  <h1 style="color:Yellow; padding-right: 140px"  align="center">Слоты-----Рулетка-----Краш</h1>
+<button type="button">
+  <img src="../../static/img/casino/1f3b0.png" alt="Слоты" align="centre" width="200" height="200">
+</button>
+<button type="button">
+  <img src="../../static/img/casino/ruletka.png" alt="Рулетка" align="centre" width="200" height="200">
+</button>
+<button type="button">
+  <img src="../../static/img/casino/126425.png" alt="Краш" align="centre" width="200" height="200">
+</button>
+</div>
+{% endblock %}
