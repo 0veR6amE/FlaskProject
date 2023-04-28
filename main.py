@@ -57,6 +57,11 @@ def en_casino_slots():
     return render_template("en/casino/slots.html", username='lox', balance='0')
 
 
+@app.route("/en/paint/home")
+def painter_paint():
+    return render_template('en/paint/index.html')
+
+
 @app.route("/en/phhot/about")
 def en_phhot_about():
     return render_template("en/phhot/about.html")
@@ -199,7 +204,7 @@ def shop_success():
 @login_required
 def logout():
     logout_user()
-    return redirect("/en/phhot/home")
+    return redirect("/en/")
 
 
 @app.route("/ru/")
