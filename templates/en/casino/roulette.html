@@ -10,12 +10,36 @@
     margin-top: 10px;
     margin-bottom: 10px;
 }
+.rectangle {
+  height: 300px;
+  width: 200px;
+  background-color: Red;
+}
 </style>
 <h1 style="color:Yellow" align="center">Roulette</h1>
 <h2 style="color:Yellow" align="right">{{ username }}</h2>
 <h3 style="color:White" align="right">Balance: {{ balance }}</h3>
 <div class="roulette" style="">
+    <div class="rectangle" style="margin-left: 660px;"><big>56</big></div>
+    <div class="form-check" style="color: Grey;margin-left: 730px;margin-top: 30px;">
+    <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1">
+    <label class="form-check-label" for="flexRadioDefault1">
+        Black
+    </label>
+    </div>
+    <div class="form-check" style="color: Red;margin-left: 730px;">
+    <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2">
+    <label class="form-check-label" for="flexRadioDefault2">
+        Red
+    </label>
+    </div>
+        <div class="form-check" style="color: Green;margin-left: 730px;">
+    <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault3">
+    <label class="form-check-label" for="flexRadioDefault3">
+        Green
+    </label>
+    </div>
+    <input type="number" placeholder="Input bet here" size="40" style="margin-left: 570px;margin-top: 50px;">
     <button class="btn btn-success rounded-pill px-3" type="button">START</button>
-    <input type="number" placeholder="Input bet here" size="40" style="margin-left: 570px;" align="centre">
 </div>
 {% endblock %}
