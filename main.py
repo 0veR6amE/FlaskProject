@@ -52,9 +52,19 @@ def en_casino_startscreen():
     return render_template("en/casino/startscreen.html", username='lox', balance='0')
 
 
-@app.route("/en/casino/slots")
+@app.route("/en/casino/slots/")
 def en_casino_slots():
     return render_template("en/casino/slots.html", username='lox', balance='0')
+
+
+@app.route("/en/casino/roulette/")
+def en_casino_roulette():
+    return render_template("en/casino/roulette.html", username='lox', balance='0')
+
+
+@app.route("/en/casino/crash/")
+def en_casino_crash():
+    return render_template("en/casino/crash.html", username='lox', balance='0')
 
 
 @app.route("/en/phhot/about")
