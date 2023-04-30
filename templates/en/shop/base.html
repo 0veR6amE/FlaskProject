@@ -85,7 +85,11 @@
                 <li>5x "ten" chips</li>
                 <li>6x "five" chips</li>
             </ul>
-            <button type="button" class="w-100 btn btn-lg btn-outline-primary" value="Free"><a href="shop/success">Get</a></button>
+            {% if current_user.is_authenticated %}
+              <a href="free/success"><button type="button" class="w-100 btn btn-lg btn-outline-primary" value="Free">Get</button></a>
+            {% else %}
+                <a href="free/unsuccess"><button type="button" class="w-100 btn btn-lg btn-outline-primary" value="Free">Get</button></a>
+            {% endif %}
           </div>
         </div>
       </div>
@@ -104,7 +108,7 @@
                 <li>7x "ten" chips</li>
                 <li>10x "five" chips</li>
             </ul>
-            <button type="button" class="w-100 btn btn-lg btn-outline-primary"><a href="shop/paying">Buy</a></button>
+            <button type="button" class="w-100 btn btn-lg btn-outline-primary"><a href="success">Buy</a></button>
           </div>
         </div>
       </div>
@@ -123,7 +127,7 @@
                 <li>17x "ten" chips</li>
                 <li>30x "five" chips</li>
             </ul>
-            <button type="button" class="w-100 btn btn-lg btn-outline-primary"><a href="shop/paying">Buy</a></button>
+            <button type="button" class="w-100 btn btn-lg btn-outline-primary"><a href="success">Buy</a></button>
           </div>
         </div>
       </div>
