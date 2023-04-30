@@ -2,14 +2,6 @@ import os
 
 from sqlalchemy import update, select
 
-"""
-
-1. Доделать фотошоп
-2. Сделать ссылк на проекты
-3. Сделать регистрацию
-4. API Для казино
-
-"""
 from flask import Flask, render_template, redirect, request, flash
 from werkzeug.utils import secure_filename
 from flask_login import LoginManager, login_user, login_required, logout_user
@@ -57,9 +49,24 @@ def en_home_reg():
     return render_template('en/main.html', username=CURRENT_USER)
 
 
+@app.route("/en/casino/slots/")
+def en_casino_slots():
+    return render_template("en/casino/slots.html", username='lox', balance='0')
+
 @app.route("/en_log/")
 def en_home_non_reg():
     return render_template('en/main_non_reg.html')
+
+
+
+@app.route("/en/casino/roulette/")
+def en_casino_roulette():
+    return render_template("en/casino/roulette.html", username='lox', balance='0')
+
+
+@app.route("/en/casino/crash/")
+def en_casino_crash():
+    return render_template("en/casino/crash.html", username='lox', balance='0')
 
 
 @app.route("/en/phhot/about")
