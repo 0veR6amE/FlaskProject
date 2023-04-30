@@ -1,6 +1,12 @@
-{% extends "en/phhot/base.html" %}
+{% extends "header.html" %}
 {% block title %}<title>Авторизация</title>{% endblock %}
-{% block base %}
+{% block content %}
+<style>body{
+    margin-left: 50px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    margin-right: 50px;
+}</style>
     <h1>Авторизация</h1>
     <form action="" method="post">
         {{ form.hidden_tag() }}
