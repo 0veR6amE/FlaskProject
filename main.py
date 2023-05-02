@@ -31,7 +31,7 @@ def load_user(user_id):
 
 def allowed_file(filename):
     return '.' in filename and \
-        filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
 @app.route('/test')
@@ -71,13 +71,13 @@ def reqister():
     form = RegisterForm()
     if form.validate_on_submit():
         if form.password.data != form.password_again.data:
-            return render_template('en/phhot/register.html',
+            return render_template('en/register.html',
                                    title='Регистрация',
                                    form=form,
                                    message="Пароли не совпадают")
         db_sess = db_session.create_session()
         if db_sess.query(User).filter(User.email == form.email.data).first():
-            return render_template('en/phhot/register.html',
+            return render_template('en/register.html',
                                    title='Регистрация',
                                    form=form,
                                    message="Такой пользователь уже есть")
@@ -95,7 +95,7 @@ def reqister():
         user.set_password(form.password.data)
         db_sess.add(user)
         db_sess.commit()
-        return redirect('/en/login/')
+        return redirect('/en_log/login/')
     return render_template('en/register.html', title='Регистрация',
                            form=form)
 
@@ -122,8 +122,21 @@ def login():
 
 @app.route("/en/casino/")
 def en_casino_startscreen():
-    return render_template("en/casino/startscreen.html", username='lox',
-                           balance='0')
+    if CURRENT_USER:
+        db_sess = db_session.create_session()
+        user_balance = db_sess.execute(select(User.balance).filter(
+            User.email == CURRENT_USER)).first()[0]
+        db_sess.commit()
+        return render_template("en/casino/startscreen.html",
+                               username=CURRENT_USER,
+                               balance=user_balance)
+    else:
+        return redirect('/en_log/login/')
+
+
+@app.route("/en_log/casino/")
+def en_log_casino_startscreen():
+    return redirect('/en_log/login/')
 
 
 def slots_prokrutka(balance, bet):
@@ -158,7 +171,10 @@ def slots_prokrutka(balance, bet):
         else:
             win = -bet
     else:
-        result = 'неверная ставка или недостаточно средств'
+        pics.append(cells['7'])
+        pics.append(cells['7'])
+        pics.append(cells['7'])
+        result = 'Неверная ставка или недостаточно средств!'
     balance += win
     return (result, pics, win, balance)
 
@@ -169,19 +185,28 @@ def en_casino_slots():
         price = 0
         for key, value in request.form.items():
             if key == 'price':
-                price = int(value)
+                price = value
         print(price)
         db_sess = db_session.create_session()
         user_balance = db_sess.execute(select(User.balance).filter(
             User.email == CURRENT_USER)).first()[0]
         if price:
-            result, pics, win, balance = slots_prokrutka(user_balance, price)
+            result, pics, win, balance = slots_prokrutka(user_balance, int(price))
             db_sess.query(User).filter_by(email=CURRENT_USER).update(
                 {"balance": balance})
             db_sess.commit()
-            return render_template("en/casino/slots.html", username=CURRENT_USER,
-                                   balance=balance, win=win, result=result,
-                                   first=pics[0], second=pics[1], thrid=pics[2])
+            if len(result) != 3:
+                return render_template("en/casino/slots.html",
+                                       username=CURRENT_USER,
+                                       balance=balance, win=win, result=result,
+                                       first=pics[0], second=pics[1],
+                                       thrid=pics[2])
+            else:
+                return render_template("en/casino/slots.html",
+                                       username=CURRENT_USER,
+                                       balance=balance, win=win, result='',
+                                       first=pics[0], second=pics[1],
+                                       thrid=pics[2])
         db_sess.commit()
         return render_template("en/casino/slots.html", username=CURRENT_USER,
                                balance=user_balance, win=0, result='',
@@ -191,10 +216,74 @@ def en_casino_slots():
     return redirect('/en_log/login/')
 
 
-@app.route("/en/casino/roulette/")
+def slots_ruletka(balance, bet, picked_color):
+    from random import choice
+
+    win = 0
+    color = ''
+    number = 0
+    all_nums = [0, 32, 15, 19, 4, 21, 2, 25, 17, 34, 6, 27, 13, 36, 11, 30, 8,
+                23,
+                10, 5, 24, 16, 33, 1, 20, 14, 31, 9, 22, 18, 29, 7, 28, 12, 35,
+                3,
+                26]
+    black_nums = [15, 4, 2, 17, 6, 13, 11, 8, 10, 24, 33,
+                  20, 31, 22, 29, 28, 35, 26]  # номера чёрных
+    red_nums = [32, 19, 21, 25, 34, 27, 36, 30, 23, 5, 16, 1, 14, 9, 18, 7, 12,
+                3]
+    #  номера красных
+    green_nums = [0]  # зеро (зелёная)
+    if 0 < bet <= balance:  # проверка ставки
+        number = choice(all_nums)  # выбор номера
+        if number in black_nums:  # цвет по номеру
+            color = '#808080'
+        elif number in red_nums:
+            color = '#FF0000'
+        elif number in green_nums:
+            color = '#008000'
+        if picked_color == color and color == '#808080':  # проверка на выигрыш
+            win = bet * 2
+        elif picked_color == color and color == '#FF0000':
+            win = bet * 3
+        elif picked_color == color and color == '#008000':
+            win = bet * 20
+        else:
+            win = -bet
+    else:
+        print('Неверная ставка или недостаточно средств')
+    balance += win
+    return (balance, win, color, picked_color, number)
+
+
+@app.route("/en/casino/roulette/", methods=['POST', 'GET'])
 def en_casino_roulette():
-    return render_template("en/casino/roulette.html", username='lox',
-                           balance='0')
+    if CURRENT_USER:
+        db_sess = db_session.create_session()
+        user_balance = db_sess.execute(select(User.balance).filter(
+            User.email == CURRENT_USER)).first()[0]
+        price = 0
+        for key, value in request.form.items():
+            print(key, value)
+            if key == 'price':
+                price = int(value)
+        print(price)
+        picked_color = '#FF0000'
+        if price:
+            balance, win, color, number = slots_ruletka(user_balance, price,
+                                                          picked_color)
+            db_sess.query(User).filter_by(email=CURRENT_USER).update(
+                {"balance": balance})
+            db_sess.commit()
+            return render_template("en/casino/roulette.html",
+                                   username=CURRENT_USER,
+                                   balance=balance, win=win, num=number,
+                                   color=color)
+        db_sess.commit()
+        return render_template("en/casino/roulette.html",
+                               username=CURRENT_USER,
+                               balance=user_balance, num=32, color='#FF0000')
+    else:
+        return redirect('/en_log/login/')
 
 
 @app.route("/en/casino/crash/")
@@ -222,7 +311,7 @@ def en_log_phhot_about():
     return render_template("en/phhot/about.html")
 
 
-@login_required
+"""@login_required
 @app.route("/en/phhot/redactor", methods=['GET', 'POST'])
 def login_en_phhot_redactor():
     if request.method == 'POST':
@@ -248,29 +337,36 @@ def login_en_phhot_redactor():
         else:
             return render_template("en/phhot/photo_redact.html",
                                    message='Файл не того типа')
-    return render_template("en/phhot/photo_redact.html", message='')
+    return render_template("en/phhot/photo_redact.html", message='')"""
 
 
-@app.route("/en/phhot/redactor", methods=['GET'])
+@app.route("/en/phhot/redactor")
 def en_phhot_paint():
-    print(request.values)
     return render_template("en/paint/index.html")
 
 
-@app.route("/en_log/phhot/redactor", methods=['GET'])
+@app.route("/en_log/phhot/redactor")
 def en_log_phhot_paint():
-    print(request.values)
     return render_template("en/paint/index.html")
 
 
 @app.route('/en/shop/home')
 def shop_home():
-    return render_template('/en/shop/base.html')
+    if CURRENT_USER:
+        db_sess = db_session.create_session()
+        user_balance = db_sess.execute(
+            select(User.balance).filter(User.email == CURRENT_USER)).first()
+        db_sess.commit()
+        return render_template('/en/shop/base.html', balance=user_balance[0],
+                               where='')
+    return render_template('/en/shop/base.html', balance='Login',
+                           where='/en_log/register/')
 
 
 @app.route('/en_log/shop/home')
 def log_shop_home():
-    return render_template('/en/shop/base.html')
+    return render_template('/en/shop/base.html', balance='Login',
+                           where='/en_log/register/')
 
 
 @app.route('/en_log/game')
@@ -281,64 +377,80 @@ def en_game():
 def add_balance(balance):
     if CURRENT_USER:
         db_sess = db_session.create_session()
-        user_balance = db_sess.execute(select(User.balance).filter(User.email == CURRENT_USER)).first()
+        user_balance = db_sess.execute(
+            select(User.balance).filter(User.email == CURRENT_USER)).first()
         b = balance + user_balance[0]
-        db_sess.query(User).filter_by(email=CURRENT_USER).update({"balance":b})
+        db_sess.query(User).filter_by(email=CURRENT_USER).update(
+            {"balance": b})
         db_sess.commit()
     else:
         return redirect('/en_log/login/')
 
 
+@app.route('/en_log/shop/free/success')
+def log_free_shop_success():
+    return redirect('/en_log/login')
+
+
+@app.route('/en_log/shop/amature/success')
+def log_amature_shop_success():
+    return redirect('/en_log/login')
+
+
+@app.route('/en_log/shop/profession/success')
+def log_profession_shop_success():
+    return redirect('/en_log/login')
+
+
 @app.route('/en_log/shop/free/unsuccess')
-def log_free_shop_success0():
+def log_free_shop_unsuccess():
     return redirect('/en_log/login')
 
 
 @app.route('/en_log/shop/amature/unsuccess')
-def log_amature_shop_success0():
+def log_amature_shop_unsuccess():
     return redirect('/en_log/login')
 
 
 @app.route('/en_log/shop/profession/unsuccess')
-def log_profession_shop_success0():
+def log_profession_shop_unsuccess():
     return redirect('/en_log/login')
 
 
 @app.route('/en/shop/free/unsuccess')
-def free_shop_success0():
+def free_shop_unsuccess():
     return redirect('/en_log/login')
 
 
 @app.route('/en/shop/amature/unsuccess')
-def amature_shop_success0():
+def amature_shop_unsuccess():
     return redirect('/en_log/login')
 
 
 @app.route('/en/shop/profession/unsuccess')
-def profession_shop_success0():
+def profession_shop_unsuccess():
     return redirect('/en_log/login')
 
 
 @app.route('/en/shop/free/success')
 @login_required
-def free_shop_success1():
-    print(1)
+def free_shop_success():
     add_balance(1500)
-    return '<h1>НЕ ЗАБЫТЬ РАЗРАБОТАТЬ ДИЗАЙН</h1>'
+    return render_template('en/shop/back.html')
 
 
 @app.route('/en/shop/amature/success')
 @login_required
-def amature_shop_success1():
+def amature_shop_success():
     add_balance(3000)
-    return '<h1>НЕ ЗАБЫТЬ РАЗРАБОТАТЬ ДИЗАЙН</h1>'
+    return render_template('en/shop/back.html')
 
 
 @app.route('/en/shop/profession/success')
 @login_required
-def profession_shop_success1():
+def profession_shop_success():
     add_balance(5000)
-    return '<h1>НЕ ЗАБЫТЬ РАЗРАБОТАТЬ ДИЗАЙН</h1>'
+    return render_template('en/shop/back.html')
 
 
 @app.route("/ru/")

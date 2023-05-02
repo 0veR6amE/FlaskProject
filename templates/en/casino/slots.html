@@ -12,9 +12,9 @@
     margin-bottom: 10px;
 }
 </style>
-<h1 style="color:Yellow" align="center">Slot-machine</h1>
+<a href="/en/casino" class="nav-link"><h1 style="color:Yellow" align="center">Slot-machine</h1></a>
 <h2 style="color:Yellow" align="right">{{ username }}</h2>
-<h3 style="color:White" align="right">Balance: {{ balance }}</h3>
+<a href="/en/shop/home" class="nav-link"><h3 style="color:White" align="right">Balance: {{ balance }}</h3></a>
 <h4 style="color:White" align="right">Win: {{ win }}</h4>
 <h3 style="color:White" align="centre">{{ result }}</h3>
 <div class="slotmachine" style="margin-top: -50px;">
@@ -25,7 +25,7 @@
     <img src={{ thrid }} alt="7" style="margin-top: -520px;margin-left: 13px;" width="80" height="80">
     </div>
     <form method="post" name="form">
-    <button  class="btn btn-success rounded-pill px-3" type="button" style="margin-top: -500px;margin-left: 150px;"><input type="submit" name="submit" formmethod="post">START</input></button>
+    <input type="submit" name="submit" formmethod="post">START</input>
     <input type="number" name="price" placeholder="Input bet here" formmethod="post" size="40" style="margin-left: 570px; margin-top: -200px;"></form>
 </div>
 {% endblock %}
