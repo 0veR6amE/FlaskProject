@@ -1,9 +1,6 @@
-import os
-
 from flask import Flask, render_template, redirect, request
 from flask_login import LoginManager, login_user, login_required, logout_user
-from sqlalchemy import update, select
-from werkzeug.utils import secure_filename
+from sqlalchemy import select
 
 from data import db_session
 from data.users import User
@@ -34,7 +31,7 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
-@app.route('/test')
+@app.route('/test', methods=['GET', 'POST'])
 def test():
     return render_template('test.html')
 
@@ -72,31 +69,24 @@ def reqister():
     if form.validate_on_submit():
         if form.password.data != form.password_again.data:
             return render_template('en/register.html',
-                                   title='Регистрация',
+                                   title='Registration',
                                    form=form,
-                                   message="Пароли не совпадают")
+                                   message="Passwords are differents")
         db_sess = db_session.create_session()
         if db_sess.query(User).filter(User.email == form.email.data).first():
             return render_template('en/register.html',
-                                   title='Регистрация',
+                                   title='Registration',
                                    form=form,
-                                   message="Такой пользователь уже есть")
-        if not form.username.data:
-            username = form.name.data
-        else:
-            username = form.username.data
+                                   message="You already have an account")
         user = User(
-            name=form.name.data,
-            username=username,
             email=form.email.data,
-            about=form.about.data,
             balance=0
         )
         user.set_password(form.password.data)
         db_sess.add(user)
         db_sess.commit()
         return redirect('/en_log/login/')
-    return render_template('en/register.html', title='Регистрация',
+    return render_template('en/register.html', title='Registration',
                            form=form)
 
 
@@ -110,14 +100,13 @@ def login():
         user = db_sess.query(User
                              ).filter(User.email == form.login.data).first()
         if user and user.check_password(form.password.data):
-            login_user(user, remember=form.remember_me.data)
+            login_user(user)
             CURRENT_USER = form.login.data
-            print(CURRENT_USER)
             return redirect("/en/")
-        return render_template('/en/login.html',
-                               message="Неправильный логин или пароль",
+        return render_template('/en/login.html', title='Login',
+                               message="Incorrect login or password",
                                form=form)
-    return render_template('/en/login.html', form=form)
+    return render_template('/en/login.html', title='Login', form=form)
 
 
 @app.route("/en/casino/")
@@ -142,7 +131,6 @@ def en_log_casino_startscreen():
 def slots_prokrutka(balance, bet):
     from random import choice
 
-    print('begin')
     im = '../../../static/img/casino/'
     cells = {'7': im + '7.png', 'b': im + 'banana.png', 'B': im + 'bigwin.png',
              'c': im + 'cherry.png', 'd': im + 'drain.png',
@@ -186,12 +174,12 @@ def en_casino_slots():
         for key, value in request.form.items():
             if key == 'price':
                 price = value
-        print(price)
         db_sess = db_session.create_session()
         user_balance = db_sess.execute(select(User.balance).filter(
             User.email == CURRENT_USER)).first()[0]
         if price:
-            result, pics, win, balance = slots_prokrutka(user_balance, int(price))
+            result, pics, win, balance = slots_prokrutka(user_balance,
+                                                         int(price))
             db_sess.query(User).filter_by(email=CURRENT_USER).update(
                 {"balance": balance})
             db_sess.commit()
@@ -222,6 +210,7 @@ def slots_ruletka(balance, bet, picked_color):
     win = 0
     color = ''
     number = 0
+    result = ''
     all_nums = [0, 32, 15, 19, 4, 21, 2, 25, 17, 34, 6, 27, 13, 36, 11, 30, 8,
                 23,
                 10, 5, 24, 16, 33, 1, 20, 14, 31, 9, 22, 18, 29, 7, 28, 12, 35,
@@ -250,45 +239,65 @@ def slots_ruletka(balance, bet, picked_color):
         else:
             win = -bet
     else:
-        print('Неверная ставка или недостаточно средств')
+        result = 'Incorrect bid or insufficient funds'
     balance += win
-    return (balance, win, color, picked_color, number)
+    return (balance, win, color, number, result)
 
 
 @app.route("/en/casino/roulette/", methods=['POST', 'GET'])
 def en_casino_roulette():
+    def hellper(error):
+        return render_template("en/casino/roulette.html",
+                               username=CURRENT_USER,
+                               balance=user_balance, win=0, num=32,
+                               color='#FF0000',
+                               result=error)
+
     if CURRENT_USER:
+        price = 0
         db_sess = db_session.create_session()
         user_balance = db_sess.execute(select(User.balance).filter(
             User.email == CURRENT_USER)).first()[0]
-        price = 0
         for key, value in request.form.items():
-            print(key, value)
             if key == 'price':
-                price = int(value)
-        print(price)
-        picked_color = '#FF0000'
-        if price:
-            balance, win, color, number = slots_ruletka(user_balance, price,
-                                                          picked_color)
-            db_sess.query(User).filter_by(email=CURRENT_USER).update(
-                {"balance": balance})
+                price = value
+        picked_color = request.form.get('select')
+        if picked_color != 'Choose Color':
+            if price:
+                balance, win, color, number, result = slots_ruletka(
+                    user_balance, int(price), picked_color)
+
+                db_sess.query(User).filter_by(email=CURRENT_USER).update(
+                    {"balance": balance})
+                db_sess.commit()
+                if result:
+                    return hellper(result)
+                return render_template("en/casino/roulette.html",
+                                       username=CURRENT_USER,
+                                       balance=balance, win=win, num=number,
+                                       color=color, result='')
+            else:
+                db_sess.commit()
+                return hellper('Please, choose the bid')
+        else:
             db_sess.commit()
-            return render_template("en/casino/roulette.html",
-                                   username=CURRENT_USER,
-                                   balance=balance, win=win, num=number,
-                                   color=color)
-        db_sess.commit()
-        return render_template("en/casino/roulette.html",
-                               username=CURRENT_USER,
-                               balance=user_balance, num=32, color='#FF0000')
+            return hellper('Please, choose the color')
+
     else:
         return redirect('/en_log/login/')
 
 
 @app.route("/en/casino/crash/")
 def en_casino_crash():
-    return render_template("en/casino/crash.html", username='lox', balance='0')
+    if CURRENT_USER:
+        db_sess = db_session.create_session()
+        user_balance = db_sess.execute(select(User.balance).filter(
+            User.email == CURRENT_USER)).first()[0]
+        db_sess.commit()
+        return render_template("en/casino/crash.html", username=CURRENT_USER,
+                               balance=user_balance)
+    else:
+        return redirect('/en_log/login/')
 
 
 @app.route("/en/phhot/home")
@@ -350,6 +359,16 @@ def en_log_phhot_paint():
     return render_template("en/paint/index.html")
 
 
+@app.route('/en_log/games/')
+def en_log_games():
+    return render_template('en/game/index.html')
+
+
+@app.route('/en/games/')
+def en_games():
+    return render_template('en/game/index.html')
+
+
 @app.route('/en/shop/home')
 def shop_home():
     if CURRENT_USER:
@@ -367,11 +386,6 @@ def shop_home():
 def log_shop_home():
     return render_template('/en/shop/base.html', balance='Login',
                            where='/en_log/register/')
-
-
-@app.route('/en_log/game')
-def en_game():
-    return render_template('en/game/index.html')
 
 
 def add_balance(balance):

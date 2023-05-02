@@ -1,5 +1,5 @@
 {% extends "header.html" %}
-{% block title %}<title>Регистрация</title>{% endblock %}
+{% block title %}<title>{{ title }}</title>{% endblock %}
 
 {% block content %}
 <style>body{
@@ -8,22 +8,13 @@
     margin-bottom: 20px;
     margin-right: 50px;
 }</style>
-<h1>Регистрация</h1>
+<h1>{{ title }}</h1>
 <form action="" method="post">
 	{{ form.hidden_tag() }}
 	<p>
 		{{ form.email.label }}<br>
 		{{ form.email(class="form-control", type="email") }}<br>
 		{% for error in form.email.errors %}
-	<p class="alert alert-danger" role="alert">
-		{{ error }}
-	</p>
-	{% endfor %}
-	</p>
-	<p>
-		{{ form.username.label }}<br>
-		{{ form.username() }}<br>
-		{% for error in form.username.errors %}
 	<p class="alert alert-danger" role="alert">
 		{{ error }}
 	</p>
@@ -46,25 +37,6 @@
 		{{ error }}
 	</p>
 	{% endfor %}
-	</p>
-	<p>
-		{{ form.name.label }}<br>
-		{{ form.name(class="form-control") }}<br>
-		{% for error in form.name.errors %}
-	<p class="alert alert-danger" role="alert">
-		{{ error }}
-	</p>
-	{% endfor %}
-	</p>
-	<p>
-		{{ form.about.label }}<br>
-		{{ form.about(class="form-control") }}<br>
-		{% for error in form.about.errors %}
-	<p class="alert alert-danger" role="alert">
-		{{ error }}
-	</p>
-	{% endfor %}
-	</p>
 	<p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
 	{{message}}
 </form>

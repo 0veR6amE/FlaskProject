@@ -1,5 +1,5 @@
 {% extends "header.html" %}
-{% block title %}<title>Авторизация</title>{% endblock %}
+{% block title %}<title>{{ title }}</title>{% endblock %}
 {% block content %}
 <style>body{
     margin-left: 50px;
@@ -7,7 +7,7 @@
     margin-bottom: 20px;
     margin-right: 50px;
 }</style>
-    <h1>Авторизация</h1>
+    <h1>{{ title }}</h1>
     <form action="" method="post">
         {{ form.hidden_tag() }}
         <p>
@@ -28,7 +28,6 @@
                 </div>
             {% endfor %}
         </p>
-        <p>{{ form.remember_me() }} {{ form.remember_me.label }}</p>
         <p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
         <div>{{ message }}</div>
     </form>
