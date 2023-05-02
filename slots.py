@@ -22,9 +22,9 @@ if 0 < bet <= balance:  # прокрутка
         pics.append(cells.get(i))  # картиночка
     if result in combos.keys():  # проверка результата на коэф
         win = bet * combos.get(result)
-    elif 'BB' in result:
+    elif result.count('B') == 2:
         win = bet * 5
-    elif 'B' in result:
+    elif result.count('B') == 1:
         win = bet * 2
     else:
         win = -bet
